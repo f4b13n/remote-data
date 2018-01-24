@@ -1,0 +1,111 @@
+// @flow
+export type RemoteData<E, A> =
+  | NotAsked<E, A>
+  | Fetching<E, A>
+  | Failure<E, A>
+  | Success<E, A>
+
+type CaseOf<E, A, B> = {|
+  NotAsked: () => B;
+  Fetching: () => B;
+  Failure: (e: E) => B;
+  Success: (a: A) => B;
+|}
+
+declare class NotAsked<E, A> {
+  +tag: 'NotAsked';
+  isNotAsked(): boolean;
+  isFetching(): boolean;
+  isFailure(): boolean;
+  isSuccess(): boolean;
+  map<B>(f: (a: A) => B): RemoteData<E, B>;
+  ap<B>(fab: RemoteData<E, (a: A) => B>): RemoteData<E, B>;
+  chain<B>(f: (a: A) => RemoteData<E, B>): RemoteData<E, B>;
+  fold<R>(cases: CaseOf<E, A, R>): R;
+  getOrElse(a: A): A;
+  get(): A;
+}
+
+declare class Fetching<E, A> {
+  +tag: 'Fetching';
+  isNotAsked(): boolean;
+  isFetching(): boolean;
+  isFailure(): boolean;
+  isSuccess(): boolean;
+  map<B>(f: (a: A) => B): RemoteData<E, B>;
+  ap<B>(fab: RemoteData<E, (a: A) => B>): RemoteData<E, B>;
+  chain<B>(f: (a: A) => RemoteData<E, B>): RemoteData<E, B>;
+  fold<R>(cases: CaseOf<E, A, R>): R;
+  getOrElse(a: A): A;
+  get(): A;
+}
+
+declare class Failure<E, A> {
+  +tag: 'Failure';
+  +error: E;
+  isNotAsked(): boolean;
+  isFetching(): boolean;
+  isFailure(): boolean;
+  isSuccess(): boolean;
+  map<B>(f: (a: A) => B): RemoteData<E, B>;
+  ap<B>(fab: RemoteData<E, (a: A) => B>): RemoteData<E, B>;
+  chain<B>(f: (a: A) => RemoteData<E, B>): RemoteData<E, B>;
+  fold<R>(cases: CaseOf<E, A, R>): R;
+  getOrElse(a: A): A;
+  get(): A;
+}
+
+declare class Success<E, A> {
+  +tag: 'Success';
+  +value: A;
+  isNotAsked(): boolean;
+  isFetching(): boolean;
+  isFailure(): boolean;
+  isSuccess(): boolean;
+  map<B>(f: (a: A) => B): RemoteData<E, B>;
+  ap<B>(fab: RemoteData<E, (a: A) => B>): RemoteData<E, B>;
+  chain<B>(f: (a: A) => RemoteData<E, B>): RemoteData<E, B>;
+  fold<R>(cases: CaseOf<E, A, R>): R;
+  getOrElse(a: A): A;
+  get(): A;
+}
+
+declare export var notAsked: () => RemoteData<any, any>
+
+declare export var fetching: () => RemoteData<any, any>
+
+declare export var failure: <E>(e: E) => RemoteData<E, any>
+
+declare export var success: <A>(a: A) => RemoteData<any, A>
+
+declare export var isNotAsked: <E, A>(fa: RemoteData<E, A>) => boolean
+
+declare export var isFetching: <E, A>(fa: RemoteData<E, A>) => boolean
+
+declare export var isFailure: <E, A>(fa: RemoteData<E, A>) => boolean
+
+declare export var isSuccess: <E, A>(fa: RemoteData<E, A>) => boolean
+
+declare export var map:
+  & (<E, A, B>(f: (a: A) => B, fa: RemoteData<E, A>) => RemoteData<E, B>)
+  & (<E, A, B>(f: (a: A) => B) => (fa: RemoteData<E, A>) => RemoteData<E, B>)
+
+declare export var ap:
+  & (<E, A, B>(fab: RemoteData<E, (a: A) => B>, fa: RemoteData<E, A>) => RemoteData<E, B>)
+  & (<E, A, B>(fab: RemoteData<E, (a: A) => B>) => (fa: RemoteData<E, A>) => RemoteData<E, B>)
+
+declare export var chain:
+  & (<E, A, B>(f: (a: A) => RemoteData<E, B>, fa: RemoteData<E, A>) => RemoteData<E, B>)
+  & (<E, A, B>(f: (a: A) => RemoteData<E, B>) => (fa: RemoteData<E, A>) => RemoteData<E, B>)
+
+declare export var fold:
+  & (<E, A, T>(cases: CaseOf<E, A, T>, fa: RemoteData<E, A>) => T)
+  & (<E, A, T>(cases: CaseOf<E, A, T>) => (fa: RemoteData<E, A>) => T)
+
+declare export var getOrElse:
+  & (<E, A>(a: A, fa: RemoteData<E, A>) => A)
+  & (<E, A>(a: A) => (fa: RemoteData<E, A>) => A)
+
+declare export var get: <A>(fa: RemoteData<*, A>) => A
+
+declare export var all: <E, A>(arr: RemoteData<E, A>[]) => RemoteData<E, A[]>
